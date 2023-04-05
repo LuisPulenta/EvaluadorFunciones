@@ -5,13 +5,42 @@
         public static double Evaluate(string infix)
         {
             var postfix = ToPostfix(infix);
-            Console.WriteLine(postfix);
             return Calculate(postfix);
         }
 
-        private static double Calculate(object postfix)
+        private static double Calculate(string postfix)
         {
-            return 0;
+            var stack = new Stack<double>(100);
+            for (int i = 0; i < postfix.Length; i++)
+            {
+                if (IsOperator(postfix[i]))
+                {
+                    var number2 = stack.Pop();
+                    var number1 = stack.Pop();
+                    var result = Calculate(number1, postfix[i], number2);
+                    stack.Push(result);
+
+                }
+                else
+                {
+                    var number = (double)postfix[i]-48;
+                    stack.Push(number);
+                }
+            }
+            return stack.Pop();
+        }
+
+        private static double Calculate(double number1, char @operator, double number2)
+        {
+            switch (@operator)
+            {
+                case '^': return Math.Pow(number1,number2);
+                case '*': return number1 * number2;
+                case '/': return number1 / number2;
+                case '+': return number1 + number2;
+                case '-': return number1 - number2;
+                default: throw new Exception("Not valid operator");
+            }
         }
 
         private static string ToPostfix(string infix)
