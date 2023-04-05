@@ -4,21 +4,83 @@
     {
         public static double Evaluate(string infix)
         {
-            var prefix = ToPostfix(infix);
-            return Calculate(prefix);
+            var postfix = ToPostfix(infix);
+            Console.WriteLine(postfix);
+            return Calculate(postfix);
         }
 
         private static double Calculate(object postfix)
         {
-            throw new NotImplementedException();
+            return 0;
         }
 
-        private static object ToPostfix(string infix)
+        private static string ToPostfix(string infix)
         {
-            throw new NotImplementedException();
+            var stack = new Stack<char>(100);
+            var postfix = string.Empty;
+            for (int i = 0; i < infix.Length; i++)
+            {
+                if (IsOperator(infix[i]))
+                {
+                    if (stack.IsEmpty)
+                    {
+                        stack.Push(infix[i]);
+                    }
+                    else
+                    {
+                        if (infix[i] == ')')
+                        {
+                            do
+                            {
+                                postfix += stack.Pop();
+
+                            } while (stack.GetItemInTop() != '(');
+                            stack.Pop();
+                        }
+                        else
+                        {
+                            if (PriorityInExpression(infix[i]) > PriorityInStack(stack.GetItemInTop()))
+                            {
+                                stack.Push(infix[i]);
+                            }
+                            else
+                            {
+                                postfix += stack.Pop();
+                                stack.Push(infix[i]);
+                            }
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    postfix += (infix[i]);
+                }
+                }
+            while (!stack.IsEmpty)
+            {
+                postfix += stack.Pop();
+            };
+            return postfix;
         }
 
-        private int PriorityInExpression(char @operator)
+        private static bool IsOperator(char item)
+        {
+            if(item=='(' ||
+                item == ')' ||
+                item == '^' ||
+                item == '*' ||
+                item == '/' ||
+                item == '+' ||
+                item == '-'
+                )
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private static int PriorityInExpression(char @operator)
         {
             switch (@operator){
                 case '^': return 4;
@@ -31,7 +93,7 @@
             }
         }
 
-        private int PriorityInStack(char @operator)
+        private static int PriorityInStack(char @operator)
         {
             switch (@operator)
             {
