@@ -333,6 +333,7 @@
             Controls.Add(btn7);
             Controls.Add(txtDisplay);
             Name = "Form1";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Evaluador de funciones";
             ResumeLayout(false);
             PerformLayout();

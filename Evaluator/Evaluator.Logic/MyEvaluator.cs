@@ -2,17 +2,22 @@
 {
     public class MyEvaluator
     {
+        //---------------------------------------------------------------------------------------
         public static double Evaluate(string infix)
         {
             var postfix = ToPostfix(infix);
+            Console.WriteLine(infix);
+            Console.WriteLine(postfix);
             return Calculate(postfix);
         }
 
+        //---------------------------------------------------------------------------------------
         private static double Calculate(string postfix)
         {
-            var stack = new Stack<double>(100);
+            var stack = new Stack<double>();
             for (int i = 0; i < postfix.Length; i++)
             {
+
                 if (IsOperator(postfix[i]))
                 {
                     var number2 = stack.Pop();
@@ -23,13 +28,22 @@
                 }
                 else
                 {
-                    var number = (double)postfix[i]-48;
+                    i++;
+                    var numberString = string.Empty;
+                    while (postfix[i]!=']')
+                    {
+                        numberString += postfix[i];
+                        i++;
+                    }
+
+                    var number = Convert.ToDouble(numberString);
                     stack.Push(number);
                 }
             }
             return stack.Pop();
         }
 
+        //---------------------------------------------------------------------------------------
         private static double Calculate(double number1, char @operator, double number2)
         {
             switch (@operator)
@@ -43,15 +57,29 @@
             }
         }
 
+        //---------------------------------------------------------------------------------------
         private static string ToPostfix(string infix)
         {
-            var stack = new Stack<char>(100);
+            var isFirstNumber = true;
+            var isClosedNumber = false;
+
+            var stack = new Stack<char>();
             var postfix = string.Empty;
+            
             for (int i = 0; i < infix.Length; i++)
             {
                 if (IsOperator(infix[i]))
                 {
-                    if (stack.IsEmpty)
+                    if (!isClosedNumber)
+                    {
+                        if (!string.IsNullOrEmpty(postfix))
+                        {
+                            postfix += ']';
+                            isFirstNumber = true;
+                        }                        
+                    }
+
+                    if (stack.Count==0)
                     {
                         stack.Push(infix[i]);
                     }
@@ -63,12 +91,12 @@
                             {
                                 postfix += stack.Pop();
 
-                            } while (stack.GetItemInTop() != '(');
+                            } while (stack.Peek() != '(');
                             stack.Pop();
                         }
                         else
                         {
-                            if (PriorityInExpression(infix[i]) > PriorityInStack(stack.GetItemInTop()))
+                            if (PriorityInExpression(infix[i]) > PriorityInStack(stack.Peek()))
                             {
                                 stack.Push(infix[i]);
                             }
@@ -82,17 +110,31 @@
                     }
                 }
                 else
-                {
-                    postfix += (infix[i]);
+                    {
+                        if (isFirstNumber)
+                        {
+                            postfix += '[';
+                            isFirstNumber = false;
+                        }
+                        postfix += (infix[i]);
+                    }
                 }
-                }
-            while (!stack.IsEmpty)
+
+            var last = postfix[postfix.Length - 1];
+
+            if (!IsOperator(last))
+            {
+                postfix += ']';
+            }
+            
+            while (stack.Count != 0)
             {
                 postfix += stack.Pop();
             };
             return postfix;
         }
 
+        //---------------------------------------------------------------------------------------
         private static bool IsOperator(char item)
         {
             if(item=='(' ||
@@ -109,6 +151,7 @@
             return false;
         }
 
+        //---------------------------------------------------------------------------------------
         private static int PriorityInExpression(char @operator)
         {
             switch (@operator){
@@ -122,6 +165,7 @@
             }
         }
 
+        //---------------------------------------------------------------------------------------
         private static int PriorityInStack(char @operator)
         {
             switch (@operator)
