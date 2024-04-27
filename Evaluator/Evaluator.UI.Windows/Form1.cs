@@ -66,7 +66,7 @@ namespace Evaluator.UI.Windows
         {
             if (!_wasPoint)
             {
-                txtDisplay.Text += ".";
+                txtDisplay.Text += ",";
                 _wasPoint = true;
             }
             
